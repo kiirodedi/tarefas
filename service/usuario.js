@@ -3,7 +3,7 @@ import pool from '../data/index.js';
 export const cadastrarUsuario = async (filtro = '') => {
     try {
         const cx = await pool.getConnection();
-        const cmdSql = `INSERT INTO usuarios(nome, email, nome, senha) VALUES (?, ?, ?, ?)`;
+        const cmdSql = `INSERT INTO usuarios(nome, email, senha) VALUES (?, ?, ?, ?)`;
         await cx.query(cmdSql, [nome, email, nome, senha]);
 
         const [result] = await cx.query('SELECT LAST_INSERT_ID() as lastId');
@@ -17,25 +17,20 @@ export const cadastrarUsuario = async (filtro = '') => {
     }
 };
 
-export const consultarUsuario = async (filtro = '') => {
+export const alterarUsuario = async (id, dados) => {
     try {
         const cx = await pool.getConnection();
-        const cmdSql = `SELECT * FROM usuarios WHERE usuarios.nome LIKE ?`;
-        const [dados, meta_dados] = await cx.query(cmdSql, [`%${filtro}%`]);
-        cx.release();
-        return dados;
-    } catch (error) {
-        throw error;
-    }
-};
+        const { nome, email, senha } = dados;
 
-export const consultarUsuarioPorId = async (id) => {
-    try {
-        const cx = await pool.getConnection();
-        const cmdSql = 'SELECT * FROM usuarios WHERE usuarios.id = ?';
-        const [dados, meta_dados] = await cx.query(cmdSql, [id]);
+        const [resultado] = await cx.query(
+            `UPDATE usuarios
+             SET nome = ?, email = ?, senha = ?
+             WHERE id = ?`,
+            [nome, email, senha, id]
+        );
+
         cx.release();
-        return dados;
+        return resultado;
     } catch (error) {
         throw error;
     }

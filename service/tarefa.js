@@ -30,7 +30,7 @@ export const consultarTarefa = async (filtro = '') => {
     }
 };
 
-export const excluirTarefas = async (id) => {
+export const excluirTarefa = async (id) => {
     try {
         const cx = await pool.getConnection();
         const [dados, meta_dados] = await cx.query('DELETE FROM tarefas WHERE id = ?', [id]);
@@ -50,6 +50,25 @@ export const consultarTarefasPorUsuario = async (usuarioId) => {
         );
         cx.release();
         return dados;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const alterarTarefa = async (id, dados) => {
+    try {
+        const cx = await pool.getConnection();
+        const { titulo, descricao, data, status } = dados;
+
+        const [resultado] = await cx.query(
+            `UPDATE tarefas
+             SET titulo = ?, descricao = ?, data = ?, status = ?
+             WHERE id = ?`,
+            [titulo, descricao, data, status, id]
+        );
+
+        cx.release();
+        return resultado;
     } catch (error) {
         throw error;
     }
